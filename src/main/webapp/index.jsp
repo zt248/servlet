@@ -1,11 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=utf-8" %>
 <html>
-
 <body>
-<h2>
-    ${'Test'}
-    ${name}
-</h2>
-<%= new java.util.Date() %>
+<form method="post" action="/employeeServlet">
+    <%--<input name="filePath"/>--%>
+    <%--<input name="fileName"/>--%>
+    <input type="submit" name="action" value="Employee" />
+</form>
 </body>
 </html>
