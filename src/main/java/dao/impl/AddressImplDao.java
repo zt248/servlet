@@ -74,10 +74,10 @@ public class AddressImplDao extends Utill implements AddressDao {
         try {
             preparedStatementAdd(sql);
 //            psAdd.setLong(1, address.getId());
-            psAdd.setString(2, address.getCountry());
-            psAdd.setString(3, address.getCity());
-            psAdd.setString(4, address.getStreet());
-            psAdd.setString(5, address.getPostCode());
+            psAdd.setString(1, address.getCountry());
+            psAdd.setString(2, address.getCity());
+            psAdd.setString(3, address.getStreet());
+            psAdd.setString(4, address.getPostCode());
 
             psAdd.executeUpdate();
         } catch (Exception e) {

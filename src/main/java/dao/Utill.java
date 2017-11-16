@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 public class Utill  {
 
     private static final String DB_DRIVE = "com.mysql.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/db_employees";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/db_employees?autoReconnect=true&amp;characterEncoding=UTF-8&amp;useUnicode=true";
     private static final String DB_USERNAME = "root";
     private static final String DB_PASSWORD = "root";
 

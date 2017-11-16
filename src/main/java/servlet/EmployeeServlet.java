@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
@@ -26,7 +27,10 @@ public class EmployeeServlet extends HttpServlet {
         @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        AddressImplDao addressImplDao = new AddressImplDao();
+        HttpSession session = req.getSession();
+        AddressImplDao addressImplDao = (AddressImplDao) session.getAttribute("addressDao");
+
+
         String employeeId = req.getParameter("employeeId");
         String employeeCountry = req.getParameter("employeeCountry");
         String employeeCity = req.getParameter("employeeCity");
@@ -49,6 +53,15 @@ public class EmployeeServlet extends HttpServlet {
         }else if("AddEmployee".equals(action)){
             try {
                 addressImplDao.add(new Address(null,employeeCountry,employeeCity,employeeStreet,employeePostCode));
+                forward("/WEB-INF/jsp/employee.jsp",req,resp);
+            } catch (DaoException e) {
+                e.printStackTrace();
+            }
+        }else if("DeleteEmployee".equals(action)){
+            forward("/WEB-INF/jsp/deleteEmployee.jsp",req,resp);
+        } else if("RemoveEmployee".equals(action)){
+            try {
+                addressImplDao.remove(new Address(Long.valueOf(employeeId),null,null,null,null));
                 forward("/WEB-INF/jsp/employee.jsp",req,resp);
             } catch (DaoException e) {
                 e.printStackTrace();
