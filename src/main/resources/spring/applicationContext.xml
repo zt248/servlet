@@ -28,13 +28,13 @@
         <property name="password" value="${jdbc.password}"/>
     </bean>
 
-    <mvc:annotation-driven/>
+    <!--<mvc:annotation-driven/>-->
 
     <!--Definition for AddressImplDao bean-->
-    <bean id="addressImplDao"
-    class="dao.impl.AddressImplDao" >
-    <property name="dataSource" ref="dataSource"/>
-    </bean>
+    <!--<bean id="addressImplDao"-->
+    <!--class="dao.impl.AddressImplDao" >-->
+    <!--<property name="dataSource" ref="dataSource"/>-->
+    <!--</bean>-->
 
     <context:annotation-config/>
 

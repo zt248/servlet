@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-//@Repository(value = "addressImplDao")
+@Repository(value = "addressImplDao")
 public class AddressImplDao implements AddressDao {
 
     private JdbcTemplate jdbcTemplate;
