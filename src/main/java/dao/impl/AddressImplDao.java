@@ -1,192 +1,78 @@
 package dao.impl;
 
-import dao.DaoException;
-import dao.Utill;
 import dao.AddressDao;
 import entity.Address;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
-import java.util.ArrayList;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
+@Repository(value = "addressImplDao")
+public class AddressImplDao implements AddressDao {
 
-public class AddressImplDao extends Utill implements AddressDao {
+    private JdbcTemplate jdbcTemplate;
 
-    private Connection connection = getConnection();
-
-    private PreparedStatement psAdd = null;
-    private PreparedStatement psGetById = null;
-    private PreparedStatement psUpdate = null;
-    private PreparedStatement psRemove = null;
-
-
-
-    private PreparedStatement preparedStatementAdd(String sql) throws DaoException {
-
-        try {
-            if (psAdd == null) {
-                psAdd = connection.prepareStatement(sql);
-            }
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
-        return psAdd;
+    @Autowired
+    @Override
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
 
-    private PreparedStatement preparedStatementGetById(String sql) throws DaoException {
-        try {
-            if (psGetById == null) {
-                psGetById = connection.prepareStatement(sql);
-            }
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
-        return psGetById;
-    }
-
-    private PreparedStatement preparedStatementUpdate(String sql) throws DaoException {
-        try {
-            if (psUpdate == null) {
-                psUpdate = connection.prepareStatement(sql);
-            }
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
-        return psUpdate;
-    }
-
-    private PreparedStatement preparedStatementRemove(String sql) throws DaoException {
-        try {
-            if (psRemove == null) {
-                psRemove = connection.prepareStatement(sql);
-            }
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
-        return psRemove;
-    }
-
-
-    public void add(Address address) throws DaoException {
-//        String sql = "INSERT INTO ADDRESS (ID, COUNTRY, CITY, STREET, POST_CODE) VALUES (?,?,?,?,?);";
+    @Override
+    public void add(Address address) {
         String sql = "INSERT INTO ADDRESS (COUNTRY, CITY, STREET, POST_CODE) VALUES (?,?,?,?);";
-        try {
-            preparedStatementAdd(sql);
-//            psAdd.setLong(1, address.getId());
-            psAdd.setString(1, address.getCountry());
-            psAdd.setString(2, address.getCity());
-            psAdd.setString(3, address.getStreet());
-            psAdd.setString(4, address.getPostCode());
-
-            psAdd.executeUpdate();
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
+        PreparedStatementCreator preparedStatementCreator = new PreparedStatementCreator(){
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setString(1,address.getCountry());
+                preparedStatement.setString(2,address.getCity());
+                preparedStatement.setString(3,address.getStreet());
+                preparedStatement.setString(4,address.getPostCode());
+                return preparedStatement;
+            }
+        };
+        jdbcTemplate.update(preparedStatementCreator,generatedKeyHolder);
+        long id = generatedKeyHolder.getKey().longValue();
+        address.setId(id);
+//        String sql = "INSERT INTO ADDRESS (ID,COUNTRY, CITY, STREET, POST_CODE) VALUES (?,?,?,?,?);";
+//        jdbcTemplate.update(sql, address.getId(), address.getCountry(), address.getCity(), address.getStreet(), address.getPostCode());
     }
 
-    public List<Address> getAll() throws DaoException {
-        List<Address> addressList = new ArrayList<Address>();
-
+    @Override
+    public List<Address> getAll() {
         String sql = "SELECT ID, COUNTRY, CITY, STREET, POST_CODE FROM ADDRESS";
-        Statement statement = null;
-
-        try {
-            statement = connection.createStatement();
-
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                Address address = new Address();
-                address.setId(resultSet.getLong("ID"));
-                address.setCountry(resultSet.getString("COUNTRY"));
-                address.setCity(resultSet.getString("CITY"));
-                address.setStreet(resultSet.getString("STREET"));
-                address.setPostCode(resultSet.getString("POST_CODE"));
-                addressList.add(address);
-            }
-            resultSet.close();
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
-
+        List<Address> addressList = jdbcTemplate.query(sql, new AddressMapper());
         return addressList;
     }
 
-    public Address getById(Long id) throws DaoException {
+    @Override
+    public Address getById(Long id) {
         String sql = "SELECT ID, COUNTRY, CITY, STREET, POST_CODE FROM ADDRESS WHERE ID = ?";
-
-        Address address = new Address();
-        preparedStatementGetById(sql);
-        try {
-            psGetById.setLong(1, id);
-            ResultSet resultSet = psGetById.executeQuery();
-
-            resultSet.next();
-            address.setId(resultSet.getLong("ID"));
-            address.setCountry(resultSet.getString("COUNTRY"));
-            address.setCity(resultSet.getString("CITY"));
-            address.setStreet(resultSet.getString("STREET"));
-            address.setPostCode(resultSet.getString("POST_CODE"));
-            resultSet.close();
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
+        jdbcTemplate.queryForList(sql,new Object[]{id});
+        Address address = jdbcTemplate.queryForObject(sql, new Object[]{id}, new AddressMapper());
         return address;
     }
 
-    public void update(Address address) throws DaoException {
-
+    @Override
+    public void update(Address address) {
         String sql = "UPDATE ADDRESS SET COUNTRY=?, CITY=?, STREET=?, POST_CODE=? WHERE ID=?";
-
-        preparedStatementUpdate(sql);
-
-        try {
-            psUpdate.setString(1, address.getCountry());
-            psUpdate.setString(2, address.getCity());
-            psUpdate.setString(3, address.getStreet());
-            psUpdate.setString(4, address.getPostCode());
-            psUpdate.setLong(5, address.getId());
-
-            psUpdate.executeUpdate();
-
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
-
+        jdbcTemplate.update(sql, address.getCountry(), address.getCity(), address.getStreet(), address.getPostCode(), address.getId());
     }
 
-    public void remove(Address address) throws DaoException {
-
+    @Override
+    public void remove(Address address) {
         String sql = "DELETE FROM ADDRESS WHERE ID=?";
-
-        preparedStatementRemove(sql);
-
-        try {
-            psRemove.setLong(1, address.getId());
-            psRemove.executeUpdate();
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
-
-    }
-
-
-    public void close() throws DaoException {
-        try {
-            if (psAdd != null) {
-                psAdd.close();
-            } else if (psGetById != null) {
-                psGetById.close();
-            } else if (psUpdate != null) {
-                psUpdate.close();
-            } else if (psRemove != null) {
-                psRemove.close();
-            } else if (connection != null) {
-                connection.close();
-            }
-        } catch (Exception e) {
-            throw new DaoException(e);
-        }
-        System.out.println("Connection OFF");
+        jdbcTemplate.update(sql, address.getId());
     }
 }

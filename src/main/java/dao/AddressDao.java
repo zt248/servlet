@@ -2,9 +2,12 @@ package dao;
 
 import entity.Address;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 public interface AddressDao {
+
+    public void setDataSource(DataSource dataSource);
 
     //create
     void add(Address address) throws DaoException;
