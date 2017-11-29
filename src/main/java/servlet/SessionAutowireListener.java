@@ -4,19 +4,18 @@ import dao.impl.AddressImplDao;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-@WebListener
+//@WebListener
 public class SessionAutowireListener implements HttpSessionListener {
 
 
     @Override
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring/applicationContext.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("WEB-INF/applicationContext.xml");
 
         AddressImplDao addressImplDao = (AddressImplDao) context.getBean("addressImplDao");
 

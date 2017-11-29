@@ -21,7 +21,6 @@ public class AddressImplDao implements AddressDao {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    @Override
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

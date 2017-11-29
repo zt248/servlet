@@ -10,7 +10,7 @@ public class Domain {
 //        Utill utill = new Utill();
 //        utill.getConnection();
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring/applicationContext.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("WEB-INF/applicationContext.xml");
 
         AddressImplDao addressImplDao = (AddressImplDao) context.getBean("addressImplDao");
 

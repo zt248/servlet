@@ -3,9 +3,8 @@ package servlet;
 import dao.impl.AddressImplDao;
 import entity.Address;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.servlet.RequestDispatcher;
@@ -15,13 +14,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/employeeServlet")
 public class EmployeeServlet extends HttpServlet {
+//
+//
+//    public void init(ServletConfig config) throws ServletException {
+//        super.init(config);
+//        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this,
+//                config.getServletContext());
+//    }
 
+    @Autowired
+    private AddressImplDao addressImplDao;
 
 
     protected void forward(String to, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -32,8 +39,8 @@ public class EmployeeServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        HttpSession session = req.getSession();
-        AddressImplDao addressImplDao = (AddressImplDao) session.getAttribute("addressDao");
+//        HttpSession session = req.getSession();
+//        AddressImplDao addressImplDao = (AddressImplDao) session.getAttribute("addressDao");
 
         String employeeId = req.getParameter("employeeId");
         String employeeCountry = req.getParameter("employeeCountry");
